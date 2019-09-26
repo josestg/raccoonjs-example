@@ -1,10 +1,11 @@
-const { Feature } = require("raccoonjs/Raccoon")
-const utils = require("raccoonjs/utils");
+const { Feature } = require("raccoonjs/Feature")
+const helper = require("raccoonjs/helper");
 const db = require("./fakedb");
+const { ResponseMessage } = require('raccoonjs/ResponseMessage')
 
 class Report extends Feature {
-    constructor(id) {
-        super(id);
+    constructor(owner) {
+        super(owner);
     }
 
     async start() {
@@ -16,10 +17,10 @@ class Report extends Feature {
                 const { name, status } = task;
                 if (status == db.DONE) continue;
 
-                const btn = utils.makeButton(name, {
+                const btn = helper.makeButton(name, {
                     prefix: this.prefix,
                     action: "onTaskClicked",
-                    params: utils.encodePosition(row, 0)
+                    params: helper.encodePosition(row, 0)
                 });
                 keyboard.push([btn]);
                 row += 1;
@@ -27,66 +28,52 @@ class Report extends Feature {
         }
 
         keyboard.push([
-            utils.makeButton("Done", {
+            helper.makeButton("Done", {
                 prefix: this.prefix,
                 action: "onTaskDone",
-                params: utils.encodePosition(row + 1, 0)
+                params: helper.encodePosition(row + 1, 0)
             }),
-            utils.makeButton("Cancel", {
+            helper.makeButton("Cancel", {
                 prefix: this.prefix,
                 action: "onTaskCancel",
-                params: utils.encodePosition(row + 1, 1)
+                params: helper.encodePosition(row + 1, 1)
             })
         ]);
 
-        return {
-            id: this.id,
-            type: "$send",
+        return new ResponseMessage("$send", {
+            owner: this.owner,
             message: "Berikut adalah task Anda!",
-            options: {
-                parse_mode: "Markdown",
-                reply_markup: {
-                    inline_keyboard: keyboard
-                }
-            }
-        };
+            inline_keyboard: keyboard
+        })
     }
 
     onTaskClicked(params, context) {
-        const { row, col } = utils.decodePosition(params);
+        const { row, col } = helper.decodePosition(params);
         const { message } = context;
         const { inline_keyboard: keyboard } = message.reply_markup;
-        keyboard[row][col].text = utils.toogleCheckIcon(
+        keyboard[row][col].text = helper.toogleCheckIcon(
             keyboard[row][col].text
         );
 
-        return {
-            id: this.id,
-            type: "$edit",
+        return new ResponseMessage("$edit", {
+            owner: this.owner,
             message: message.text,
-            options: {
-                parse_mode: "Markdown",
-                reply_markup: {
-                    inline_keyboard: keyboard
-                }
-            }
-        };
+            inline_keyboard: keyboard
+        })
     }
 
     onTaskDone(params, context) {
-        return {
-            id: this.id,
-            type: "$delete",
+        return new ResponseMessage("$delete", {
+            owner: this.owner,
             destroy: true
-        };
+        })
     }
 
     onTaskCancel(params, context) {
-        return {
-            id: this.id,
-            type: "$delete",
+        return new ResponseMessage("$delete", {
+            owner: this.owner,
             destroy: true
-        };
+        })
     }
 }
 

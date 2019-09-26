@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/josestg/raccoonjs-example#readme",
   "dependencies": {
-    "raccoonjs": "^1.0.0"
+    "raccoonjs": "^1.2.0"
   }
 }

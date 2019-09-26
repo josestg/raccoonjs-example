@@ -10,12 +10,15 @@ $ npm install
 $ node main.js
 ```
 
-command : **/r**
-
 ## Screenshoot
 
-<img src='./images/report.png' align="left"/>
-<img src='./images/report-select.png'/>
+### Task 
+command : **/t**
+<img src='./images/demo.gif'/>
+
+### Report 
+command : **/r**
+<img src='./images/demo-report.gif'/>
 
 ## Similar project
 1. [privy-standup-meeting-bot](https://github.com/mtfiqh/privy-standup-meeting-bot.git)
